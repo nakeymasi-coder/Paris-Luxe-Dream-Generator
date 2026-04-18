@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paris Luxe Dream Generator</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --panel: rgba(20, 20, 28, 0.94);
+      --panel2: rgba(30, 30, 41, 0.96);
+      --line: rgba(255,255,255,0.12);
+      --text: #f6f2eb;
+      --muted: #cbc3b7;
+      --gold: #d4ab5a;
+      --red: #a61f33;
+      --cream: #efe2cf;
+      --teal: #63c8ca;
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+      --radius: 20px;
+      --success: #67d58c;
+      --warning: #ffd166;
+      --error: #ff8f8f;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(212,171,90,0.16), transparent 26%),
+        radial-gradient(circle at top right, rgba(166,31,51,0.16), transparent 24%),
+        radial-gradient(circle at bottom center, rgba(99,200,202,0.11), transparent 24%),
+        linear-gradient(180deg, #09090d, #111118 52%, #0d0d12 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .floating-bg,
+    .floating-bg::before,
+    .floating-bg::after {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-bg::before,
+    .floating-bg::after {
+      content: "";
+      opacity: 0.08;
+      background-repeat: repeat;
+    }
+
+    .floating-bg::before {
+      background-image:
+        radial-gradient(circle at 8% 18%, rgba(255,255,255,0.25) 0 2px, transparent 3px),
+        radial-gradient(circle at 77% 34%, rgba(212,171,90,0.3) 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 80%, rgba(99,200,202,0.3) 0 2px, transparent 3px),
+        radial-gradient(circle at 58% 62%, rgba(166,31,51,0.22) 0 2px, transparent 3px);
+      animation: driftA 26s linear infinite;
+    }
+
+    .floating-bg::after {
+      background-image:
+        linear-gradient(120deg, transparent 0 46%, rgba(255,255,255,0.05) 48%, transparent 50%),
+        linear-gradient(40deg, transparent 0 46%, rgba(212,171,90,0.05) 48%, transparent 50%);
+      animation: driftB 34s linear infinite;
+    }
+
+    @keyframes driftA {
+      0% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-16px) scale(1.02); }
+      100% { transform: translateY(0px) scale(1); }
+    }
+
+    @keyframes driftB {
+      0% { transform: translateX(0px); }
+      50% { transform: translateX(-18px); }
+      100% { transform: translateX(0px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 80px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      padding: 28px 24px 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,171,90,0.18), transparent 68%);
+      filter: blur(18px);
+    }
+
+    .brand {
+      margin: 0;
+      color: var(--cream);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 0 18px rgba(212,171,90,0.18);
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 980px;
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    .marquee-wrap {
+      margin-top: 18px;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .marquee {
+      display: flex;
+      gap: 34px;
+      width: max-content;
+      white-space: nowrap;
+      padding: 11px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      font-size: 0.92rem;
+      animation: marquee 24s linear infinite;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .presets {
+      margin-top: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .preset-title {
+      margin: 0;
+      color: var(--cream);
+      font-size: 1.03rem;
+      letter-spacing: 0.04em;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .preset-btn,
+    .action,
+    select,
+    textarea,
+    input[type="text"] {
+      font: inherit;
+    }
+
+    .preset-btn {
+      border: 1px solid rgba(212,171,90,0.22);
+      background: linear-gradient(135deg, rgba(212,171,90,0.13), rgba(255,255,255,0.04));
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.25s ease;
+      text-align: center;
+    }
+
+    .preset-btn:hover,
+    .preset-btn.active {
+      transform: translateY(-2px);
+      border-color: rgba(212,171,90,0.6);
+      box-shadow: 0 8px 24px rgba(212,171,90,0.18);
+      background: linear-gradient(135deg, rgba(212,171,90,0.25), rgba(166,31,51,0.16));
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 20px;
+      margin-top: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panel-head h2,
+    .panel-head h3 {
+      margin: 0;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      background: var(--panel2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .field select,
+    .field input[type="text"],
+    .field textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      outline: none;
+    }
+
+    .field select option { color: #111; }
+
+    .field-tools {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .field-tools .mini-lock {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .field-tools .mini-lock.active {
+      background: linear-gradient(135deg, rgba(212,171,90,0.24), rgba(166,31,51,0.18));
+      border-color: rgba(212,171,90,0.5);
+      box-shadow: 0 6px 18px rgba(212,171,90,0.16);
+    }
+
+    .field-custom {
+      margin-top: 8px;
+    }
+
+    .field-custom input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      outline: none;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.2s ease;
+      user-select: none;
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, rgba(212,171,90,0.24), rgba(166,31,51,0.18));
+      border-color: rgba(212,171,90,0.5);
+      box-shadow: 0 6px 18px rgba(212,171,90,0.16);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .action {
+      border: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      border-radius: 999px;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      color: #fff;
+      transition: 0.2s ease;
+      background: linear-gradient(135deg, #7e1624, #d4ab5a);
+      box-shadow: 0 12px 26px rgba(0,0,0,0.28);
+    }
+
+    .action.secondary { background: linear-gradient(135deg, #1f2b34, #3f595b); }
+    .action.dark {
+      background: linear-gradient(135deg, #17181f, #272b36);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .action:hover { transform: translateY(-2px); }
+    .action.copy-success {
+      background: linear-gradient(135deg, #1f5c38, #67d58c);
+      border-color: transparent;
+    }
+    .action.copy-warning {
+      background: linear-gradient(135deg, #6a4d12, #ffd166);
+      color: #111;
+      border-color: transparent;
+    }
+
+    .output-stack { display: grid; gap: 14px; }
+
+    .output-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .output-card .head {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .output-card .head h4 {
+      margin: 0;
+      font-size: 0.92rem;
+      color: var(--cream);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .output-card textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 14px;
+      border: none;
+      outline: none;
+      resize: vertical;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .status-bar {
+      margin-top: 12px;
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-bar.success { color: var(--success); }
+    .status-bar.warning { color: var(--warning); }
+    .status-bar.error { color: var(--error); }
+
+    details {
+      margin-top: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--cream);
+      font-weight: bold;
+      letter-spacing: 0.04em;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .history-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      text-align: center;
+      color: rgba(239,226,207,0.72);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .scroll-btns {
+      position: fixed;
+      right: 12px;
+      bottom: 18px;
+      display: grid;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .scroll-btn {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, rgba(166,31,51,0.92), rgba(212,171,90,0.96));
+      box-shadow: 0 0 20px rgba(212,171,90,0.35), 0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .controls-grid { grid-template-columns: 1fr; }
+      .container { width: min(100% - 18px, 1440px); }
+      .hero { padding: 22px 16px 18px; }
+    }
+  
+/* FLOATING PARIS ELEMENTS */
+.floating-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.float-item {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.15;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.2; }
+  100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+}
+
+/* GLOW BUTTONS */
+.action {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255,215,0,0.3);
+}
+.action:hover {
+  box-shadow: 0 0 20px rgba(255,215,0,0.8);
+  transform: translateY(-2px);
+}
+
+</style>
+</head>
+<body>
+
+<div class="floating-container">
+  <div class="float-item" style="left:10%; animation-duration:12s;">🥐</div>
+  <div class="float-item" style="left:30%; animation-duration:15s;">🗼</div>
+  <div class="float-item" style="left:50%; animation-duration:18s;">🥐</div>
+  <div class="float-item" style="left:70%; animation-duration:14s;">🗼</div>
+  <div class="float-item" style="left:85%; animation-duration:16s;">🥐</div>
+</div>
+
+  <div class="floating-bg"></div>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="brand">Paris Luxe Dream Generator</h1>
+      <p class="subtitle">Build dreamy, layered, feminine, travel-rich, object-fusion, music-fusion, emotional fine-art prompts with blended reality, painterly textures, luxury mood, editorial drama, and high-end wall-art energy.</p>
+
+      <div class="marquee-wrap">
+        <div class="marquee">
+          <span>Luxury Fusion Portraits</span>
+          <span>City + Body Blending</span>
+          <span>Painterly Mixed Media</span>
+          <span>Travel Dream Worlds</span>
+          <span>Music + Object Fusion</span>
+          <span>Romantic European Mood</span>
+          <span>Luxury Fusion Portraits</span>
+          <span>City + Body Blending</span>
+          <span>Painterly Mixed Media</span>
+          <span>Travel Dream Worlds</span>
+          <span>Music + Object Fusion</span>
+          <span>Romantic European Mood</span>
+        </div>
+      </div>
+
+      <div class="presets">
+        <h3 class="preset-title">Preset Starters</h3>
+        <div class="preset-grid" id="presetGrid"></div>
+
+        <div class="style-locks-panel">
+          <h3 class="preset-title">Style Locks</h3>
+          <div class="toggle-row" id="styleLocksPanel"></div>
+        </div>
+
+
+          <div class="actions">
+            <button class="action" id="generateBtn">Generate Prompt</button>
+            <button class="action secondary" id="randomBtn">Randomize</button>
+            <button class="action dark" id="clearBtn">Clear All</button>
+            <button class="action dark" id="saveBtn">Save Prompt</button>
+            <button class="action dark" id="generateAllBtn">Generate All Extras</button>
+          </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Generator Controls</h2>
+          <span style="color: var(--muted); font-size: 0.9rem;">Base version</span>
+        </div>
+        <div class="panel-body">
+          <div class="controls-grid" id="controlsGrid"></div>
+
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Prompt Output</h3>
+          <span style="color: var(--muted); font-size: 0.9rem;">Style-locked for your refs</span>
+        </div>
+        <div class="panel-body">
+          <div class="output-stack">
+            <div class="output-card">
+              <div class="head">
+                <h4>Main Image Prompt</h4>
+                <button class="action dark copy-btn" data-target="mainPrompt">Copy</button>
+              </div>
+              <textarea id="mainPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Short Prompt</h4>
+                <button class="action dark copy-btn" data-target="shortPrompt">Copy</button>
+              </div>
+              <textarea id="shortPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Negative Prompt</h4>
+                <button class="action dark copy-btn" data-target="negativePrompt">Copy</button>
+              </div>
+              <textarea id="negativePrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Creative Variation</h4>
+                <button class="action dark copy-btn" data-target="variationPrompt">Copy</button>
+              </div>
+              <textarea id="variationPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Concept Title</h4>
+                <button class="action dark copy-btn" data-target="titlePrompt">Copy</button>
+              </div>
+              <textarea id="titlePrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>8-Second Animation Script</h4>
+                <button class="action dark copy-btn" data-target="videoPrompt">Copy</button>
+              </div>
+              <textarea id="videoPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Suno Jingle Prompt</h4>
+                <button class="action dark copy-btn" data-target="sunoJinglePrompt">Copy</button>
+              </div>
+              <textarea id="sunoJinglePrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Suno 30-Second Song Prompt</h4>
+                <button class="action dark copy-btn" data-target="suno30Prompt">Copy</button>
+              </div>
+              <textarea id="suno30Prompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Suno 1-Minute Song Prompt</h4>
+                <button class="action dark copy-btn" data-target="suno60Prompt">Copy</button>
+              </div>
+              <textarea id="suno60Prompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Marketing Caption</h4>
+                <button class="action dark copy-btn" data-target="marketingPrompt">Copy</button>
+              </div>
+              <textarea id="marketingPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Hashtags</h4>
+                <button class="action dark copy-btn" data-target="hashtagsPrompt">Copy</button>
+              </div>
+              <textarea id="hashtagsPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>SEO Keywords</h4>
+                <button class="action dark copy-btn" data-target="seoPrompt">Copy</button>
+              </div>
+              <textarea id="seoPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Call To Action</h4>
+                <button class="action dark copy-btn" data-target="ctaPrompt">Copy</button>
+              </div>
+              <textarea id="ctaPrompt" readonly></textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="head">
+                <h4>Email Promo Copy</h4>
+                <button class="action dark copy-btn" data-target="emailPrompt">Copy</button>
+              </div>
+              <textarea id="emailPrompt" readonly></textarea>
+            </div>
+          </div>
+
+          <div id="copyStatus" class="status-bar" aria-live="polite"></div>
+
+          <details>
+            <summary>Saved Prompt History</summary>
+            <div class="actions" style="margin-top:12px;">
+              <button class="action dark" id="copyHistoryBtn">Copy History</button>
+              <button class="action dark" id="clearHistoryBtn">Clear History</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+          </details>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer-note">all rights reserved by glamorousgrammyglowup</div>
+    <div id="testResults" class="sr-only" aria-hidden="true"></div>
+  </div>
+
+  <div class="scroll-btns">
+    <button class="scroll-btn" id="scrollTopBtn">↑</button>
+    <button class="scroll-btn" id="scrollBottomBtn">↓</button>
+  </div>
+
+  <script>
+    const fields = [
+      { id: 'ethnicity', label: 'Ethnicity / Heritage', options: ['none','African American / Black','Afro-Caribbean','East African','West African','North African','French African','Eritrean','Ethiopian','Jamaican','Caribbean Black','Pacific Islander','Central Asian','Japanese','South Asian','Latina','Middle Eastern','mixed heritage'] },
+      { id: 'bodyType', label: 'Body Type', options: ['none','petite','slim','athletic','runner build','mid-size','curvy','plus-size','pear-shaped','wide-hipped','broad and regal'] },
+      { id: 'styleFamily', label: 'Style Family', options: ['none','painterly double exposure','editorial fashion portrait','object-world surrealism','romantic Paris poster art','mixed-media collage beauty','music-body fantasy fusion','coffee-steam city illusion','glam travel lifestyle','dreamy silhouette fusion','Black love story editorial art','Paris romantic watercolor illustration','gold-accent fantasy ballet','luxury hat couture illustration','romantic Paris cafe illustration','candle-object sunset realism','luxury handbag miniature world','miniature cafe city realism','dreamy lighthouse staircase fantasy','chrome France travel poster','Paris cafe dog illustration','golden wine-glass city realism','moonlit Eiffel watercolor poster','rainy Paris street fashion realism','silver-line surreal tower portrait','rose-petal suitcase Paris world','floral Eiffel night bloom','Black woman Paris cafe reading','red-beret Paris reading','vintage car moonlit Paris realism','luxury perfume-object world','storybook Paris lifestyle illustration','glam balcony lifestyle realism','editorial Paris shopping scene','romantic rooftop Paris lifestyle'] },
+      { id: 'mainSubject', label: 'Main Subject', options: ['none','glamorous woman','fashion muse','surreal feminine silhouette','dream traveler','cellist woman','gondola dream figure','hat couture woman','mystical portrait subject','elegant city muse','romantic couple','glam Paris woman','couture Black woman','cafe fashion muse','elegant poster heroine','editorial Black beauty','glam Black woman','seated glam icon','floral afro muse','luxury Black fashion muse','miniature Paris object world','fantasy staircase dream','chrome travel typography','Paris cafe muse','rainy avenue fashion muse','silver-line face silhouette','rose-petal travel world','floral Eiffel dreamscape','Black cafe reader','beret cafe reader','vintage Paris street icon','miniature perfume world','shopping muse','balcony glamour muse','rooftop date couple','luxury street-style woman'] },
+      { id: 'poseView', label: 'Pose / View', options: ['none','eyes closed portrait','soft side profile','front-facing beauty portrait','three-quarter fashion pose','seated editorial pose','back-facing feminine pose','elongated silhouette profile','head tilted dream pose','quiet reflective pose','long-leg fashion pose','high-fashion seated pose','poster-art glamour pose','confident couture pose','elegant cafe seated pose','walking away cinematic pose','reading at cafe pose','holding espresso pose','shopping stride pose','balcony leaning pose','rooftop date pose'] },
+      { id: 'emotionMood', label: 'Emotion / Mood', options: ['none','romantic','nostalgic','dreamy','mysterious','healing','quiet luxury','melancholic beauty','poetic calm','soulful wonder'] },
+      { id: 'fusionStyle', label: 'Fusion Style', options: ['none','double exposure','city inside silhouette','landscape inside body','object-world fusion','music-body fusion','steam-scene fusion','travel-dream blend','mixed-media collage fusion','painterly layered composite'] },
+      { id: 'sceneLocation', label: 'Scene / Location', options: ['none','Paris boulevard','Eiffel Tower view','Venice canal','old European street','dream river canyon','fashion studio void','vintage city bridge','cafe street at dawn','moody skyline terrace','Paris cafe terrace','rainy Paris street','moonlit Eiffel skyline','romantic bridge walkway','vintage Paris avenue','glowing European alley','Paris balcony at sunset','luxury Paris avenue walk','romantic Eiffel promenade','watercolor rose cafe street','elegant interior vignette','Paris cafe tabletop','fantasy seaside staircase','glossy France cityscape','black-and-white Paris cafe','golden avenue in a wine glass','moonlit watercolor Paris skyline','rainy red-tree Paris avenue','noir Eiffel car plaza','rose-petal travel display','floral Eiffel reflection night','cozy Paris reading cafe','moonlit vintage Paris street','luxury perfume display','Paris shopping arcade','romantic rooftop terrace','glam Paris balcony suite','designer storefront avenue'] },
+      { id: 'landmarkSymbol', label: 'Landmark / Symbol', options: ['none','Eiffel Tower','gondola','violin','coffee cup','roses','butterflies','birds in flight','old street lamps','towering hat flower','wine glass','candle','vintage red car','travel suitcase','newspaper collage','floral hairpiece','dog companion','gold butterflies','red umbrella','balcony hearts','black handbag','lighthouse','swan','chrome France text','croissant','paris heart badge','gold sparkles','silver line-art face','pink rose petals','white florals','red beret','perfume bottle','shopping bags','champagne glass','designer windows'] },
+      { id: 'fashionWardrobe', label: 'Fashion / Wardrobe', options: ['none','couture hat and soft glam','flowing black dress','red statement gown','multicolor glitter fashion dress','sleek city-chic outfit','romantic Parisian look','elegant draped silhouette','fine-art fashion draping','editorial glamour styling','striped Paris cafe fashion','red-and-black poster dress','voluminous sculptural gown','beret chic styling','soft monochrome poster look','dramatic red hat couture','black-and-white sculptural gown','sparkling glam couture dress','floral afro editorial styling','luxury poster-art fashion','crystal necklace glamour','romantic balcony eveningwear','gold-leaf ballet couture','soft watercolor romance dress','polka-dot cafe dress','rainy avenue black mini dress','silver-glow surreal styling','clear suitcase luxury styling','floral night-bloom styling','striped Paris reader style','red-beret cafe chic','moonlit vintage car styling','perfume-display couture','designer shopping streetwear','rooftop date eveningwear','balcony silk glamour'] },
+      { id: 'beautyDetails', label: 'Beauty Details', options: ['none','bold red lips','dramatic lashes','soft blush glow','smoky eyes','closed-eye serenity','flawless skin finish','glossy lips and sculpted makeup','delicate feminine elegance','high-fashion face beat','rich melanin glow','sculpted glam makeup','luxury editorial beat','deep skin luminous finish','floral hair statement'] },
+      { id: 'colorStory', label: 'Color Story', options: ['none','black cream and gold','red black and gray','sepia and ivory','teal gold and shadow','soft blush and champagne','midnight black and bronze','cream and charcoal','romantic crimson and pearl','turquoise glow with earth tones','black white and red couture','jewel-toned glamour','rich bronze and noir','cream black and scarlet','sparkling teal and gold'] },
+      { id: 'textureFinish', label: 'Texture / Finish', options: ['none','painterly brush strokes','mixed-media collage texture','soft dream haze','gold leaf accents','canvas texture','vintage poster finish','fine-art wall print finish','smoky soft blend','polished editorial digital paint','poster-art illustration finish','newsprint collage texture','glossy luxury wall art','soft watercolor haze','velvet digital airbrush finish','clean watercolor poster texture','golden realism finish','silver-line surreal rendering','glass-clear object realism','luminous floral fantasy finish','soft editorial illustration finish'] },
+      { id: 'lighting', label: 'Lighting', options: ['none','soft golden glow','moody studio light','misty backlight','sunset haze','dramatic spotlight','velvet shadow lighting','diffused romantic light','dim atmospheric glow','museum-like fine-art lighting'] },
+      { id: 'composition', label: 'Composition', options: ['none','vertical wall-art composition','full portrait focus','centered editorial poster layout','close beauty crop','tall cinematic frame','balanced asymmetrical layout','silhouette-driven composition','fashion illustration framing','fine-art print composition'] },
+      { id: 'backgroundEnergy', label: 'Background Energy', options: ['none','mist and glow','floating sparkles','soft smoke trails','architectural fade','textured abstract backdrop','collage paper fragments','dream clouds','romantic rain sheen','glowing sky haze','floating rose petals','bokeh city lights','warm cafe steam','fantasy light swirls','wet street reflections','watercolor bloom edges','gold splash texture','heart confetti glow','soft poster fade','drifting smoke ribbon','golden glitter burst','soft fantasy clouds','storybook cloud framing','rainy red foliage glow','silver smoke aura','perfume mist halo','shopping window glow','balcony twilight shimmer','rooftop star haze'] },
+      { id: 'detailEnhancers', label: 'Detail Enhancers', options: ['none','ultra-detailed','luxury editorial finish','high-end wall art','emotionally rich symbolism','delicate facial blending','elegant surrealism','fine-art realism','dreamlike atmosphere','gallery-worthy polish','Pinterest-viral polish','luxury poster-art finish','seamless silhouette fusion','clean anatomy lock','premium prompt-engineered realism','rich skin-tone rendering','editorial Black glam realism','runway-level elegance','high-fashion pose polish','romantic illustration consistency','soft painterly edge control','miniature object-world realism','luxe fantasy illustration','chrome 3D poster finish','storybook Paris charm','golden object-world realism','rainy cinematic polish','silver surreal glow finish','object-world depth realism','elegant lifestyle storytelling','luxury shopping polish'] },
+      { id: 'customIdea', label: 'Custom Add-On', type: 'text', full: true, placeholder: 'Add your own object, city, texture, pose, or concept...' }
+    ];
+
+    const presets = [
+      {
+        name: 'Paris Dream Muse',
+        values: {
+          mainSubject: 'fashion muse', poseView: 'eyes closed portrait', emotionMood: 'romantic', fusionStyle: 'double exposure', sceneLocation: 'Eiffel Tower view', landmarkSymbol: 'Eiffel Tower', fashionWardrobe: 'couture hat and soft glam', beautyDetails: 'bold red lips', colorStory: 'black cream and gold', textureFinish: 'painterly brush strokes', lighting: 'soft golden glow', composition: 'vertical wall-art composition', backgroundEnergy: 'architectural fade', detailEnhancers: 'high-end wall art'
+        }
+      },
+      {
+        name: 'Venice Reflection',
+        values: {
+          mainSubject: 'dream traveler', poseView: 'soft side profile', emotionMood: 'nostalgic', fusionStyle: 'city inside silhouette', sceneLocation: 'Venice canal', landmarkSymbol: 'gondola', fashionWardrobe: 'romantic Parisian look', beautyDetails: 'closed-eye serenity', colorStory: 'soft blush and champagne', textureFinish: 'soft dream haze', lighting: 'sunset haze', composition: 'full portrait focus', backgroundEnergy: 'dream clouds', detailEnhancers: 'emotionally rich symbolism'
+        }
+      },
+      {
+        name: 'Violin Soul River',
+        values: {
+          mainSubject: 'cellist woman', poseView: 'elongated silhouette profile', emotionMood: 'soulful wonder', fusionStyle: 'music-body fusion', sceneLocation: 'dream river canyon', landmarkSymbol: 'violin', fashionWardrobe: 'fine-art fashion draping', beautyDetails: 'delicate feminine elegance', colorStory: 'turquoise glow with earth tones', textureFinish: 'polished editorial digital paint', lighting: 'misty backlight', composition: 'silhouette-driven composition', backgroundEnergy: 'glowing sky haze', detailEnhancers: 'fine-art realism'
+        }
+      },
+      {
+        name: 'Coffee Street Memory',
+        values: {
+          mainSubject: 'mystical portrait subject', poseView: 'quiet reflective pose', emotionMood: 'poetic calm', fusionStyle: 'steam-scene fusion', sceneLocation: 'cafe street at dawn', landmarkSymbol: 'coffee cup', fashionWardrobe: 'sleek city-chic outfit', beautyDetails: 'soft blush glow', colorStory: 'sepia and ivory', textureFinish: 'smoky soft blend', lighting: 'diffused romantic light', composition: 'tall cinematic frame', backgroundEnergy: 'soft smoke trails', detailEnhancers: 'dreamlike atmosphere'
+        }
+      },
+      {
+        name: 'Red Umbrella Noir',
+        values: {
+          mainSubject: 'elegant city muse', poseView: 'back-facing feminine pose', emotionMood: 'mysterious', fusionStyle: 'travel-dream blend', sceneLocation: 'Paris boulevard', landmarkSymbol: 'roses', fashionWardrobe: 'flowing black dress', beautyDetails: 'dramatic lashes', colorStory: 'red black and gray', textureFinish: 'vintage poster finish', lighting: 'velvet shadow lighting', composition: 'centered editorial poster layout', backgroundEnergy: 'romantic rain sheen', detailEnhancers: 'gallery-worthy polish'
+        }
+      },
+      {
+        name: 'Collage Couture Face',
+        values: {
+          mainSubject: 'hat couture woman', poseView: 'front-facing beauty portrait', emotionMood: 'quiet luxury', fusionStyle: 'mixed-media collage fusion', sceneLocation: 'fashion studio void', landmarkSymbol: 'towering hat flower', fashionWardrobe: 'editorial glamour styling', beautyDetails: 'high-fashion face beat', colorStory: 'cream and charcoal', textureFinish: 'mixed-media collage texture', lighting: 'museum-like fine-art lighting', composition: 'close beauty crop', backgroundEnergy: 'collage paper fragments', detailEnhancers: 'luxury editorial finish'
+        }
+      },
+      {
+        name: 'Sparkle Glam Icon',
+        values: {
+          mainSubject: 'glamorous woman', poseView: 'seated editorial pose', emotionMood: 'dreamy', fusionStyle: 'painterly layered composite', sceneLocation: 'fashion studio void', landmarkSymbol: 'butterflies', fashionWardrobe: 'multicolor glitter fashion dress', beautyDetails: 'flawless skin finish', colorStory: 'teal gold and shadow', textureFinish: 'gold leaf accents', lighting: 'dramatic spotlight', composition: 'fashion illustration framing', backgroundEnergy: 'floating sparkles', detailEnhancers: 'ultra-detailed'
+        }
+      },
+      {
+        name: 'European Street Elegy',
+        values: {
+          styleFamily: 'dreamy silhouette fusion', mainSubject: 'surreal feminine silhouette', poseView: 'soft side profile', emotionMood: 'melancholic beauty', fusionStyle: 'landscape inside body', sceneLocation: 'old European street', landmarkSymbol: 'old street lamps', fashionWardrobe: 'elegant draped silhouette', beautyDetails: 'glossy lips and sculpted makeup', colorStory: 'romantic crimson and pearl', textureFinish: 'canvas texture', lighting: 'dim atmospheric glow', composition: 'balanced asymmetrical layout', backgroundEnergy: 'textured abstract backdrop', detailEnhancers: 'elegant surrealism'
+        }
+      },
+      {
+        name: 'Paris Cafe Glam',
+        values: {
+          styleFamily: 'glam travel lifestyle', mainSubject: 'glam Paris woman', poseView: 'seated editorial pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'Paris cafe terrace', landmarkSymbol: 'coffee cup', fashionWardrobe: 'striped Paris cafe fashion', beautyDetails: 'bold red lips', colorStory: 'black cream and gold', textureFinish: 'poster-art illustration finish', lighting: 'diffused romantic light', composition: 'fashion illustration framing', backgroundEnergy: 'warm cafe steam', detailEnhancers: 'Pinterest-viral polish'
+        }
+      },
+      {
+        name: 'Wine Glass Paris',
+        values: {
+          styleFamily: 'object-world surrealism', mainSubject: 'elegant city muse', poseView: 'quiet reflective pose', emotionMood: 'dreamy', fusionStyle: 'object-world fusion', sceneLocation: 'moonlit Eiffel skyline', landmarkSymbol: 'wine glass', fashionWardrobe: 'editorial glamour styling', beautyDetails: 'flawless skin finish', colorStory: 'soft blush and champagne', textureFinish: 'glossy luxury wall art', lighting: 'soft golden glow', composition: 'centered editorial poster layout', backgroundEnergy: 'floating sparkles', detailEnhancers: 'premium prompt-engineered realism'
+        }
+      },
+      {
+        name: 'Poster Umbrella Romance',
+        values: {
+          styleFamily: 'romantic Paris poster art', mainSubject: 'elegant poster heroine', poseView: 'back-facing feminine pose', emotionMood: 'romantic', fusionStyle: 'travel-dream blend', sceneLocation: 'rainy Paris street', landmarkSymbol: 'roses', fashionWardrobe: 'red-and-black poster dress', beautyDetails: 'dramatic lashes', colorStory: 'red black and gray', textureFinish: 'vintage poster finish', lighting: 'velvet shadow lighting', composition: 'centered editorial poster layout', backgroundEnergy: 'wet street reflections', detailEnhancers: 'luxury poster-art finish'
+        }
+      },
+      {
+        name: 'Newsprint Collage Beauty',
+        values: {
+          styleFamily: 'mixed-media collage beauty', mainSubject: 'hat couture woman', poseView: 'front-facing beauty portrait', emotionMood: 'mysterious', fusionStyle: 'mixed-media collage fusion', sceneLocation: 'fashion studio void', landmarkSymbol: 'newspaper collage', fashionWardrobe: 'editorial glamour styling', beautyDetails: 'high-fashion face beat', colorStory: 'cream and charcoal', textureFinish: 'newsprint collage texture', lighting: 'museum-like fine-art lighting', composition: 'close beauty crop', backgroundEnergy: 'collage paper fragments', detailEnhancers: 'gallery-worthy polish'
+        }
+      },
+      {
+        name: 'Golden Line Paris',
+        values: {
+          styleFamily: 'painterly double exposure', mainSubject: 'mystical portrait subject', poseView: 'eyes closed portrait', emotionMood: 'dreamy', fusionStyle: 'double exposure', sceneLocation: 'Eiffel Tower view', landmarkSymbol: 'vintage red car', fashionWardrobe: 'editorial glamour styling', beautyDetails: 'closed-eye serenity', colorStory: 'black cream and gold', textureFinish: 'soft dream haze', lighting: 'dramatic spotlight', composition: 'balanced asymmetrical layout', backgroundEnergy: 'glowing sky haze', detailEnhancers: 'seamless silhouette fusion'
+        }
+      },
+      {
+        name: 'Violin Forest Soul',
+        values: {
+          styleFamily: 'music-body fantasy fusion', mainSubject: 'cellist woman', poseView: 'elongated silhouette profile', emotionMood: 'soulful wonder', fusionStyle: 'music-body fusion', sceneLocation: 'dream river canyon', landmarkSymbol: 'violin', fashionWardrobe: 'fine-art fashion draping', beautyDetails: 'delicate feminine elegance', colorStory: 'turquoise glow with earth tones', textureFinish: 'polished editorial digital paint', lighting: 'misty backlight', composition: 'silhouette-driven composition', backgroundEnergy: 'dream clouds', detailEnhancers: 'fine-art realism'
+        }
+      },
+      {
+        name: 'Coffee Steam Eiffel',
+        values: {
+          styleFamily: 'coffee-steam city illusion', mainSubject: 'dream traveler', poseView: 'quiet reflective pose', emotionMood: 'poetic calm', fusionStyle: 'steam-scene fusion', sceneLocation: 'cafe street at dawn', landmarkSymbol: 'coffee cup', fashionWardrobe: 'sleek city-chic outfit', beautyDetails: 'soft blush glow', colorStory: 'sepia and ivory', textureFinish: 'smoky soft blend', lighting: 'sunset haze', composition: 'tall cinematic frame', backgroundEnergy: 'warm cafe steam', detailEnhancers: 'high-end wall art'
+        }
+      },
+      {
+        name: 'Black Glam Poster Art',
+        values: {
+          styleFamily: 'editorial fashion portrait', mainSubject: 'editorial Black beauty', poseView: 'high-fashion seated pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'Eiffel Tower view', landmarkSymbol: 'floral hairpiece', fashionWardrobe: 'black-and-white sculptural gown', beautyDetails: 'rich melanin glow', colorStory: 'black white and red couture', textureFinish: 'poster-art illustration finish', lighting: 'museum-like fine-art lighting', composition: 'fashion illustration framing', backgroundEnergy: 'architectural fade', detailEnhancers: 'editorial Black glam realism'
+        }
+      },
+      {
+        name: 'Floral Afro Muse',
+        values: {
+          styleFamily: 'editorial fashion portrait', mainSubject: 'floral afro muse', poseView: 'three-quarter fashion pose', emotionMood: 'dreamy', fusionStyle: 'travel-dream blend', sceneLocation: 'Eiffel Tower view', landmarkSymbol: 'floral hairpiece', fashionWardrobe: 'floral afro editorial styling', beautyDetails: 'floral hair statement', colorStory: 'black white and red couture', textureFinish: 'glossy luxury wall art', lighting: 'soft golden glow', composition: 'full portrait focus', backgroundEnergy: 'floating sparkles', detailEnhancers: 'rich skin-tone rendering'
+        }
+      },
+      {
+        name: 'Seated Couture Sparkle',
+        values: {
+          styleFamily: 'editorial fashion portrait', mainSubject: 'seated glam icon', poseView: 'long-leg fashion pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'fashion studio void', landmarkSymbol: 'butterflies', fashionWardrobe: 'sparkling glam couture dress', beautyDetails: 'luxury editorial beat', colorStory: 'sparkling teal and gold', textureFinish: 'glossy luxury wall art', lighting: 'dramatic spotlight', composition: 'fashion illustration framing', backgroundEnergy: 'fantasy light swirls', detailEnhancers: 'runway-level elegance'
+        }
+      },
+      {
+        name: 'Red Hat Editorial',
+        values: {
+          styleFamily: 'editorial fashion portrait', mainSubject: 'luxury Black fashion muse', poseView: 'confident couture pose', emotionMood: 'mysterious', fusionStyle: 'travel-dream blend', sceneLocation: 'fashion studio void', landmarkSymbol: 'towering hat flower', fashionWardrobe: 'dramatic red hat couture', beautyDetails: 'bold red lips', colorStory: 'cream black and scarlet', textureFinish: 'velvet digital airbrush finish', lighting: 'dramatic spotlight', composition: 'full portrait focus', backgroundEnergy: 'glowing sky haze', detailEnhancers: 'high-fashion pose polish'
+        }
+      },
+      {
+        name: 'Paris Glam Queen',
+        values: {
+          styleFamily: 'luxury hat couture illustration', mainSubject: 'glam Black woman', poseView: 'front-facing beauty portrait', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'Paris boulevard', landmarkSymbol: 'dog companion', fashionWardrobe: 'couture hat and soft glam', beautyDetails: 'rich melanin glow', colorStory: 'soft blush and champagne', textureFinish: 'poster-art illustration finish', lighting: 'soft golden glow', composition: 'full portrait focus', backgroundEnergy: 'watercolor bloom edges', detailEnhancers: 'romantic illustration consistency'
+        }
+      },
+      {
+        name: 'Black Love in Paris',
+        values: {
+          styleFamily: 'Black love story editorial art', mainSubject: 'romantic couple', poseView: 'three-quarter fashion pose', emotionMood: 'romantic', fusionStyle: 'travel-dream blend', sceneLocation: 'Paris balcony at sunset', landmarkSymbol: 'balcony hearts', fashionWardrobe: 'romantic balcony eveningwear', beautyDetails: 'luxury editorial beat', colorStory: 'cream black and scarlet', textureFinish: 'soft watercolor haze', lighting: 'sunset haze', composition: 'centered editorial poster layout', backgroundEnergy: 'heart confetti glow', detailEnhancers: 'Pinterest-viral polish'
+        }
+      },
+      {
+        name: 'Paris Night Walk',
+        values: {
+          styleFamily: 'Black love story editorial art', mainSubject: 'romantic couple', poseView: 'back-facing feminine pose', emotionMood: 'dreamy', fusionStyle: 'travel-dream blend', sceneLocation: 'luxury Paris avenue walk', landmarkSymbol: 'Eiffel Tower', fashionWardrobe: 'sleek city-chic outfit', beautyDetails: 'deep skin luminous finish', colorStory: 'teal gold and shadow', textureFinish: 'polished editorial digital paint', lighting: 'dramatic spotlight', composition: 'tall cinematic frame', backgroundEnergy: 'wet street reflections', detailEnhancers: 'high-end wall art'
+        }
+      },
+      {
+        name: 'Golden Art Ballet',
+        values: {
+          styleFamily: 'gold-accent fantasy ballet', mainSubject: 'fashion muse', poseView: 'confident couture pose', emotionMood: 'soulful wonder', fusionStyle: 'painterly layered composite', sceneLocation: 'Eiffel Tower view', landmarkSymbol: 'gold butterflies', fashionWardrobe: 'gold-leaf ballet couture', beautyDetails: 'delicate feminine elegance', colorStory: 'black cream and gold', textureFinish: 'gold leaf accents', lighting: 'dramatic spotlight', composition: 'vertical wall-art composition', backgroundEnergy: 'gold splash texture', detailEnhancers: 'gallery-worthy polish'
+        }
+      },
+      {
+        name: 'Paris Umbrella Rose Cafe',
+        values: {
+          styleFamily: 'romantic Paris cafe illustration', mainSubject: 'elegant poster heroine', poseView: 'back-facing feminine pose', emotionMood: 'romantic', fusionStyle: 'travel-dream blend', sceneLocation: 'watercolor rose cafe street', landmarkSymbol: 'red umbrella', fashionWardrobe: 'soft monochrome poster look', beautyDetails: 'dramatic lashes', colorStory: 'soft blush and champagne', textureFinish: 'poster-art illustration finish', lighting: 'diffused romantic light', composition: 'centered editorial poster layout', backgroundEnergy: 'floating rose petals', detailEnhancers: 'luxury poster-art finish'
+        }
+      },
+      {
+        name: 'Paris Cafe Dog Muse',
+        values: {
+          styleFamily: 'Paris cafe dog illustration', mainSubject: 'Paris cafe muse', poseView: 'elegant cafe seated pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'black-and-white Paris cafe', landmarkSymbol: 'dog companion', fashionWardrobe: 'polka-dot cafe dress', beautyDetails: 'bold red lips', colorStory: 'soft blush and champagne', textureFinish: 'clean watercolor poster texture', lighting: 'diffused romantic light', composition: 'fashion illustration framing', backgroundEnergy: 'storybook cloud framing', detailEnhancers: 'storybook Paris charm'
+        }
+      },
+      {
+        name: 'Golden Wine Glass Paris',
+        values: {
+          styleFamily: 'golden wine-glass city realism', mainSubject: 'miniature Paris object world', poseView: 'quiet reflective pose', emotionMood: 'dreamy', fusionStyle: 'object-world fusion', sceneLocation: 'golden avenue in a wine glass', landmarkSymbol: 'wine glass', fashionWardrobe: 'luxury poster-art fashion', beautyDetails: 'soft blush glow', colorStory: 'black cream and gold', textureFinish: 'golden realism finish', lighting: 'soft golden glow', composition: 'centered editorial poster layout', backgroundEnergy: 'golden glitter burst', detailEnhancers: 'golden object-world realism'
+        }
+      },
+      {
+        name: 'Moonlit Eiffel Watercolor',
+        values: {
+          styleFamily: 'moonlit Eiffel watercolor poster', mainSubject: 'elegant city muse', poseView: 'poster-art glamour pose', emotionMood: 'dreamy', fusionStyle: 'painterly layered composite', sceneLocation: 'moonlit watercolor Paris skyline', landmarkSymbol: 'gold butterflies', fashionWardrobe: 'soft monochrome poster look', beautyDetails: 'delicate feminine elegance', colorStory: 'black cream and gold', textureFinish: 'soft watercolor haze', lighting: 'dim atmospheric glow', composition: 'vertical wall-art composition', backgroundEnergy: 'storybook cloud framing', detailEnhancers: 'romantic illustration consistency'
+        }
+      },
+      {
+        name: 'Rainy Red Tree Walk',
+        values: {
+          styleFamily: 'rainy Paris street fashion realism', mainSubject: 'rainy avenue fashion muse', poseView: 'walking away cinematic pose', emotionMood: 'mysterious', fusionStyle: 'travel-dream blend', sceneLocation: 'rainy red-tree Paris avenue', landmarkSymbol: 'black handbag', fashionWardrobe: 'rainy avenue black mini dress', beautyDetails: 'flawless skin finish', colorStory: 'red black and gray', textureFinish: 'polished editorial digital paint', lighting: 'moody studio light', composition: 'tall cinematic frame', backgroundEnergy: 'wet street reflections', detailEnhancers: 'rainy cinematic polish'
+        }
+      },
+      {
+        name: 'Silver Tower Red Car',
+        values: {
+          styleFamily: 'silver-line surreal tower portrait', mainSubject: 'silver-line face silhouette', poseView: 'eyes closed portrait', emotionMood: 'dreamy', fusionStyle: 'double exposure', sceneLocation: 'noir Eiffel car plaza', landmarkSymbol: 'vintage red car', fashionWardrobe: 'silver-glow surreal styling', beautyDetails: 'closed-eye serenity', colorStory: 'red black and gray', textureFinish: 'silver-line surreal rendering', lighting: 'dramatic spotlight', composition: 'balanced asymmetrical layout', backgroundEnergy: 'silver smoke aura', detailEnhancers: 'silver surreal glow finish'
+        }
+      }
+      ,
+      {
+        name: 'Rose Petal Suitcase Paris',
+        values: {
+          styleFamily: 'rose-petal suitcase Paris world', mainSubject: 'rose-petal travel world', poseView: 'poster-art glamour pose', emotionMood: 'dreamy', fusionStyle: 'object-world fusion', sceneLocation: 'rose-petal travel display', landmarkSymbol: 'travel suitcase', fashionWardrobe: 'clear suitcase luxury styling', beautyDetails: 'soft blush glow', colorStory: 'soft blush and champagne', textureFinish: 'glass-clear object realism', lighting: 'soft golden glow', composition: 'centered editorial poster layout', backgroundEnergy: 'rose petal drift', detailEnhancers: 'crystal-clear object-world realism'
+        }
+      },
+      {
+        name: 'Floral Eiffel Night Bloom',
+        values: {
+          styleFamily: 'floral Eiffel night bloom', mainSubject: 'floral Eiffel dreamscape', poseView: 'poster-art glamour pose', emotionMood: 'dreamy', fusionStyle: 'painterly layered composite', sceneLocation: 'floral Eiffel reflection night', landmarkSymbol: 'white florals', fashionWardrobe: 'floral night-bloom styling', beautyDetails: 'delicate feminine elegance', colorStory: 'black cream and gold', textureFinish: 'luminous floral fantasy finish', lighting: 'dim atmospheric glow', composition: 'vertical wall-art composition', backgroundEnergy: 'white floral starlight', detailEnhancers: 'floral celestial glow'
+        }
+      },
+      {
+        name: 'Black Woman Paris Reader',
+        values: {
+          styleFamily: 'Black woman Paris cafe reading', mainSubject: 'Black cafe reader', poseView: 'reading at cafe pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'cozy Paris reading cafe', landmarkSymbol: 'coffee cup', fashionWardrobe: 'striped Paris reader style', beautyDetails: 'rich melanin glow', colorStory: 'soft blush and champagne', textureFinish: 'soft editorial illustration finish', lighting: 'diffused romantic light', composition: 'fashion illustration framing', backgroundEnergy: 'cozy cafe glow', detailEnhancers: 'elegant cafe editorial polish'
+        }
+      },
+      {
+        name: 'Red Beret Paris Reader',
+        values: {
+          styleFamily: 'red-beret Paris reading', mainSubject: 'beret cafe reader', poseView: 'holding espresso pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'cozy Paris reading cafe', landmarkSymbol: 'red beret', fashionWardrobe: 'red-beret cafe chic', beautyDetails: 'bold red lips', colorStory: 'cream black and scarlet', textureFinish: 'soft editorial illustration finish', lighting: 'soft golden glow', composition: 'full portrait focus', backgroundEnergy: 'cozy cafe glow', detailEnhancers: 'editorial Black glam realism'
+        }
+      },
+      {
+        name: 'Vintage Car Moonlit Paris',
+        values: {
+          styleFamily: 'vintage car moonlit Paris realism', mainSubject: 'vintage Paris street icon', poseView: 'poster-art glamour pose', emotionMood: 'dreamy', fusionStyle: 'travel-dream blend', sceneLocation: 'moonlit vintage Paris street', landmarkSymbol: 'vintage red car', fashionWardrobe: 'moonlit vintage car styling', beautyDetails: 'flawless skin finish', colorStory: 'black cream and gold', textureFinish: 'golden realism finish', lighting: 'soft golden glow', composition: 'tall cinematic frame', backgroundEnergy: 'bokeh city lights', detailEnhancers: 'golden object-world realism'
+        }
+      }
+      ,
+      {
+        name: 'Perfume Paris Dream',
+        values: {
+          styleFamily: 'luxury perfume-object world', mainSubject: 'miniature perfume world', poseView: 'poster-art glamour pose', emotionMood: 'dreamy', fusionStyle: 'object-world fusion', sceneLocation: 'luxury perfume display', landmarkSymbol: 'perfume bottle', fashionWardrobe: 'perfume-display couture', beautyDetails: 'soft blush glow', colorStory: 'soft blush and champagne', textureFinish: 'glass-clear object realism', lighting: 'soft golden glow', composition: 'centered editorial poster layout', backgroundEnergy: 'perfume mist halo', detailEnhancers: 'object-world depth realism'
+        }
+      },
+      {
+        name: 'Paris Shopping Muse',
+        values: {
+          styleFamily: 'editorial Paris shopping scene', mainSubject: 'shopping muse', poseView: 'shopping stride pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'Paris shopping arcade', landmarkSymbol: 'shopping bags', fashionWardrobe: 'designer shopping streetwear', beautyDetails: 'luxury editorial beat', colorStory: 'cream black and scarlet', textureFinish: 'soft editorial illustration finish', lighting: 'soft golden glow', composition: 'tall cinematic frame', backgroundEnergy: 'shopping window glow', detailEnhancers: 'luxury shopping polish'
+        }
+      },
+      {
+        name: 'Balcony Glam Paris',
+        values: {
+          styleFamily: 'glam balcony lifestyle realism', mainSubject: 'balcony glamour muse', poseView: 'balcony leaning pose', emotionMood: 'quiet luxury', fusionStyle: 'travel-dream blend', sceneLocation: 'glam Paris balcony suite', landmarkSymbol: 'champagne glass', fashionWardrobe: 'balcony silk glamour', beautyDetails: 'flawless skin finish', colorStory: 'soft blush and champagne', textureFinish: 'glossy luxury wall art', lighting: 'sunset haze', composition: 'full portrait focus', backgroundEnergy: 'balcony twilight shimmer', detailEnhancers: 'elegant lifestyle storytelling'
+        }
+      },
+      {
+        name: 'Rooftop Date Paris',
+        values: {
+          styleFamily: 'romantic rooftop Paris lifestyle', mainSubject: 'rooftop date couple', poseView: 'rooftop date pose', emotionMood: 'romantic', fusionStyle: 'travel-dream blend', sceneLocation: 'romantic rooftop terrace', landmarkSymbol: 'Eiffel Tower', fashionWardrobe: 'rooftop date eveningwear', beautyDetails: 'luxury editorial beat', colorStory: 'black cream and gold', textureFinish: 'soft editorial illustration finish', lighting: 'dim atmospheric glow', composition: 'tall cinematic frame', backgroundEnergy: 'rooftop star haze', detailEnhancers: 'elegant lifestyle storytelling'
+        }
+      }
+    ];
+
+    const state = { extras: [] };
+
+    function createField(field) {
+      const wrap = document.createElement('div');
+      wrap.className = 'field' + (field.full ? ' full' : '');
+      wrap.dataset.fieldId = field.id;
+
+      const label = document.createElement('label');
+      label.setAttribute('for', field.id);
+      label.textContent = field.label;
+      wrap.appendChild(label);
+
+      if (field.type === 'text') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = field.id;
+        input.placeholder = field.placeholder || '';
+        wrap.appendChild(input);
+        return wrap;
+      }
+
+      const tools = document.createElement('div');
+      tools.className = 'field-tools';
+
+      const lockBtn = document.createElement('button');
+      lockBtn.type = 'button';
+      lockBtn.className = 'mini-lock';
+      lockBtn.id = `${field.id}Lock`;
+      lockBtn.dataset.fieldId = field.id;
+      lockBtn.textContent = 'Lock';
+      lockBtn.addEventListener('click', () => {
+        lockBtn.classList.toggle('active');
+        lockBtn.textContent = lockBtn.classList.contains('active') ? 'Locked' : 'Lock';
+      });
+      tools.appendChild(lockBtn);
+      wrap.appendChild(tools);
+
+      const select = document.createElement('select');
+      select.id = field.id;
+      field.options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        select.appendChild(option);
+      });
+      wrap.appendChild(select);
+
+      const customWrap = document.createElement('div');
+      customWrap.className = 'field-custom';
+
+      const customInput = document.createElement('input');
+      customInput.type = 'text';
+      customInput.id = `${field.id}Custom`;
+      customInput.placeholder = `${field.label} custom text...`;
+      customWrap.appendChild(customInput);
+      wrap.appendChild(customWrap);
+
+      return wrap;
+    }
+
+    function renderControls() {
+      const grid = document.getElementById('controlsGrid');
+      grid.innerHTML = '';
+      fields.forEach(field => grid.appendChild(createField(field)));
+
+      const chips = [
+        'keep feminine elegance',
+        'keep travel-wall-art energy',
+        'keep painterly finish',
+        'keep luxury mood',
+        'keep surreal blending',
+        'keep romantic atmosphere'
+      ];
+
+      const lockContainer = document.getElementById('styleLocksPanel');
+      if (lockContainer) {
+        lockContainer.innerHTML = '';
+        chips.forEach(text => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'chip active';
+          chip.textContent = text;
+          chip.dataset.value = text;
+          chip.addEventListener('click', () => chip.classList.toggle('active'));
+          lockContainer.appendChild(chip);
+        });
+      }
+    }
+
+    function renderPresets() {
+      const grid = document.getElementById('presetGrid');
+      grid.innerHTML = '';
+      presets.forEach((preset, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'preset-btn';
+        btn.textContent = preset.name;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyPreset(preset.values);
+          generatePrompt();
+        });
+        if (idx === 0) btn.classList.add('active');
+        grid.appendChild(btn);
+      });
+    }
+
+    function applyPreset(values) {
+      Object.entries(values).forEach(([key, value]) => {
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = value;
+          const customEl = document.getElementById(`${key}Custom`);
+          if (customEl) customEl.value = '';
+        }
+      });
+    }
+
+    function currentValue(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+
+    function customValue(id) {
+      const el = document.getElementById(`${id}Custom`);
+      return el ? el.value.trim() : '';
+    }
+
+    function effectiveValue(id) {
+      return customValue(id) || currentValue(id);
+    }
+
+    function isLocked(id) {
+      const el = document.getElementById(`${id}Lock`);
+      return !!(el && el.classList.contains('active'));
+    }
+
+    function clean(value) {
+      return value && value !== 'none' ? value : '';
+    }
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function selectedLocks() {
+      return Array.from(document.querySelectorAll('.chip.active')).map(chip => chip.dataset.value);
+    }
+
+    function titleCase(str) {
+      return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function buildTitle(parts) {
+      const seeds = [parts.emotionMood || 'dream', parts.sceneLocation || 'fusion', parts.landmarkSymbol || 'muse'];
+      return titleCase(seeds.filter(Boolean).slice(0, 3).join(' '));
+    }
+
+    function buildVideoPrompt(parts, title) {
+      const subject = parts.mainSubject || 'glamorous muse';
+      const scene = parts.sceneLocation || 'dreamy Paris setting';
+      const mood = parts.emotionMood || 'dreamy';
+      const landmark = parts.landmarkSymbol || 'soft city detail';
+      const finish = parts.textureFinish || 'soft painterly finish';
+      const lighting = parts.lighting || 'cinematic glow';
+      return [
+        `0-2 sec: Slow cinematic reveal of ${subject} in ${scene}, subtle camera drift, elegant motion, ${lighting}.`,
+        `2-4 sec: Animate environmental details around ${landmark} with floating movement, shimmer, drifting particles, and luxury depth.`,
+        `4-6 sec: Let the scene bloom with ${mood} energy, layered transitions, soft motion graphics, and ${finish}.`,
+        `6-8 sec: End on a polished hero shot of ${title} with a gentle hold, rich atmosphere, and premium visual finish.`,
+        `Animation only. No voiceover. No dialogue. No on-screen speaking.`
+      ].join(' ');
+    }
+
+    function buildSunoPrompt(parts, title, duration) {
+      const mood = parts.emotionMood || 'dreamy';
+      const style = parts.styleFamily || 'luxury surreal editorial';
+      const color = parts.colorStory || 'gold and blush';
+      const scene = parts.sceneLocation || 'Paris night';
+      const pacing = duration === 'jingle' ? 'short hook-driven jingle' : (duration === '30' ? '30-second commercial-ready song' : '1-minute cinematic song');
+      const structure = duration === 'jingle'
+        ? 'tight catchy hook, memorable tagline energy, instant replay value'
+        : (duration === '30'
+          ? 'short intro, strong hook, polished midpoint, clean ending'
+          : 'short intro, verse, hook, lush bridge, emotional finish');
+      return `Create a ${pacing} inspired by ${title}. Mood: ${mood}. Style: ${style}. Scene inspiration: ${scene}. Color energy: ${color}. Feminine, elegant, glamorous, dreamy, emotional, polished, premium. Include ${structure}. Keep it lyrical, melodic, and visually tied to the generated concept.`;
+    }
+
+    function buildMarketingPrompt(parts, title) {
+      const scene = parts.sceneLocation || 'dreamy Paris';
+      const style = parts.styleFamily || 'luxury surreal art';
+      return `✨ ${title} ✨ A premium ${style} concept set in ${scene}. This look blends story, fashion, and dreamy visual drama into one scroll-stopping piece. Save this for inspiration, use it for content, and bring your own dream world to life.`;
+    }
+
+    function buildHashtags(parts, title) {
+      const tags = [
+        '#AIArt','#LuxuryAesthetic','#ParisVibes','#DigitalCreator','#PromptDesign',
+        '#SurrealArt','#EditorialArt','#RomanticVisuals','#ObjectWorld','#DreamyContent',
+        '#' + title.replace(/[^A-Za-z0-9]+/g, ''),
+      ];
+      return tags.join(' ');
+    }
+
+    function buildSeoKeywords(parts, title) {
+      const keywords = [
+        title,
+        parts.styleFamily || 'luxury surreal art',
+        parts.sceneLocation || 'Paris aesthetic',
+        parts.mainSubject || 'editorial fashion muse',
+        parts.landmarkSymbol || 'dreamy landmark',
+        'AI art prompt',
+        'luxury prompt generator',
+        'editorial Paris art',
+        'surreal object world',
+        'digital product content'
+      ];
+      return keywords.join(', ');
+    }
+
+    function buildCta(parts, title) {
+      return `Save this prompt, recreate ${title}, and turn your next idea into a scroll-stopping visual. Use it, remix it, and make it yours.`;
+    }
+
+    function buildEmailPromo(parts, title) {
+      const style = parts.styleFamily || 'luxury surreal art';
+      return `Subject: ${title}\n\nStep into a ${style} concept designed to feel polished, dreamy, and unforgettable. This prompt gives you a high-end visual direction you can use for content, digital products, social posts, and branded art. Open it, generate it, and bring the concept to life.`;
+    }
+
+    function collectParts() {
+      return {
+        ethnicity: clean(effectiveValue('ethnicity')),
+        bodyType: clean(effectiveValue('bodyType')),
+        styleFamily: clean(effectiveValue('styleFamily')),
+        mainSubject: clean(effectiveValue('mainSubject')),
+        poseView: clean(effectiveValue('poseView')),
+        emotionMood: clean(effectiveValue('emotionMood')),
+        fusionStyle: clean(effectiveValue('fusionStyle')),
+        sceneLocation: clean(effectiveValue('sceneLocation')),
+        landmarkSymbol: clean(effectiveValue('landmarkSymbol')),
+        fashionWardrobe: clean(effectiveValue('fashionWardrobe')),
+        beautyDetails: clean(effectiveValue('beautyDetails')),
+        colorStory: clean(effectiveValue('colorStory')),
+        textureFinish: clean(effectiveValue('textureFinish')),
+        lighting: clean(effectiveValue('lighting')),
+        composition: clean(effectiveValue('composition')),
+        backgroundEnergy: clean(effectiveValue('backgroundEnergy')),
+        detailEnhancers: clean(effectiveValue('detailEnhancers')),
+        customIdea: currentValue('customIdea')
+      };
+    }
+
+    function joinPrompt(partsArr) {
+      return partsArr.filter(Boolean).join(', ');
+    }
+
+    function setStatus(message, level) {
+      const status = document.getElementById('copyStatus');
+      if (!status) return;
+      status.textContent = message || '';
+      status.className = 'status-bar' + (level ? ` ${level}` : '');
+    }
+
+    function generatePrompt() {
+      const p = collectParts();
+      const locks = selectedLocks();
+
+      const subjectPhrase = joinPrompt([
+        p.mainSubject ? `a ${p.mainSubject}` : 'a surreal glamorous feminine subject',
+        p.ethnicity ? `preserve ${p.ethnicity}` : '',
+        p.bodyType ? `body type ${p.bodyType}` : '',
+        p.poseView,
+        p.beautyDetails,
+        p.fashionWardrobe
+      ]);
+
+      const worldPhrase = joinPrompt([
+        p.fusionStyle,
+        p.sceneLocation,
+        p.landmarkSymbol,
+        p.backgroundEnergy
+      ]);
+
+      const stylePhrase = joinPrompt([
+        p.emotionMood,
+        p.colorStory,
+        p.textureFinish,
+        p.lighting,
+        p.composition,
+        p.detailEnhancers
+      ]);
+
+      const customPhrase = p.customIdea ? `custom concept: ${p.customIdea}` : '';
+      const styleFamilyPhrase = p.styleFamily ? `style family: ${p.styleFamily}` : '';
+      const lockPhrase = locks.length ? `style locks: ${locks.join(', ')}` : '';
+      const lowerBodySafety = (
+        (p.fusionStyle && (
+          p.fusionStyle.includes('silhouette') ||
+          p.fusionStyle.includes('body') ||
+          p.fusionStyle.includes('landscape inside body')
+        )) ||
+        (p.composition && p.composition.includes('silhouette-driven composition'))
+      )
+        ? 'lower body dissolves naturally into mist, texture, and shadow; no detached legs, no floating shoes, no extra feet, no lower-body fragments at the bottom'
+        : '';
+      const anatomySafety = 'clean elegant anatomy, no broken limbs, no duplicate body parts, no distorted hands';
+      const fusionSafety = 'seamless blend only, no awkward cut lines, no harsh compositing edges';
+      const objectWorldSafety = (p.landmarkSymbol && ['coffee cup','wine glass','candle','travel suitcase','black handbag','perfume bottle','champagne glass'].includes(p.landmarkSymbol))
+        ? 'object-world scale feels intentional and believable, miniature scene integrated naturally inside the object'
+        : '';
+      const lifestyleSafety = (p.mainSubject && ['shopping muse','balcony glamour muse','rooftop date couple','luxury street-style woman','Black cafe reader','beret cafe reader','Paris cafe muse','rainy avenue fashion muse'].includes(p.mainSubject))
+        ? 'natural editorial body language, believable pose, realistic limb placement, polished lifestyle storytelling'
+        : '';
+      const parisConsistency = (p.sceneLocation && p.sceneLocation.toLowerCase().includes('paris')) || (p.landmarkSymbol && p.landmarkSymbol === 'Eiffel Tower')
+        ? 'Paris atmosphere stays elegant and cohesive, architecture feels refined, romantic, and premium'
+        : '';
+
+      const main = joinPrompt([
+        styleFamilyPhrase,
+        subjectPhrase,
+        'blending seamlessly with a layered dream world',
+        worldPhrase,
+        'surreal fine-art fusion with elegant storytelling',
+        stylePhrase,
+        customPhrase,
+        lockPhrase,
+        lowerBodySafety,
+        anatomySafety,
+        fusionSafety,
+        objectWorldSafety,
+        lifestyleSafety,
+        parisConsistency,
+        'ultra-detailed, polished, visually unforgettable, premium wall-art energy, 9:16 vertical composition'
+      ]);
+
+      const short = joinPrompt([
+        p.styleFamily,
+        p.ethnicity,
+        p.bodyType,
+        p.mainSubject || 'glamorous surreal woman',
+        p.fusionStyle || 'double exposure',
+        p.sceneLocation || 'dreamy European cityscape',
+        p.landmarkSymbol,
+        p.colorStory,
+        p.textureFinish || 'painterly mixed-media texture',
+        'luxury editorial wall art, 9:16'
+      ]);
+
+      const negative = 'low detail, blurry face, extra limbs, duplicate features, flat lighting, muddy colors, cheap digital look, bad anatomy, cropped head, cut off feet, cluttered composition, lifeless expression, stiff pose, distorted hands, oversaturated neon mess, generic stock-art feel, detached legs, floating shoes, extra feet, lower-body fragments';
+
+      const variation = joinPrompt([
+        'Create a more poetic variation of the same concept',
+        p.mainSubject ? `keeping the ${p.mainSubject}` : 'keeping the feminine muse',
+        p.sceneLocation ? `but shifting the setting toward ${p.sceneLocation}` : '',
+        p.landmarkSymbol ? `with the ${p.landmarkSymbol} used more symbolically` : '',
+        'increase emotional storytelling, layered transparency, soft glow, elegant negative space, gallery-grade painterly detail'
+      ]);
+
+      const title = buildTitle(p);
+      const video = buildVideoPrompt(p, title);
+      const sunoJingle = buildSunoPrompt(p, title, 'jingle');
+      const suno30 = buildSunoPrompt(p, title, '30');
+      const suno60 = buildSunoPrompt(p, title, '60');
+      const marketing = buildMarketingPrompt(p, title);
+      const hashtags = buildHashtags(p, title);
+      const seo = buildSeoKeywords(p, title);
+      const cta = buildCta(p, title);
+      const email = buildEmailPromo(p, title);
+
+      document.getElementById('mainPrompt').value = main;
+      document.getElementById('shortPrompt').value = short;
+      document.getElementById('negativePrompt').value = negative;
+      document.getElementById('variationPrompt').value = variation;
+      document.getElementById('titlePrompt').value = title;
+      document.getElementById('videoPrompt').value = video;
+      document.getElementById('sunoJinglePrompt').value = sunoJingle;
+      document.getElementById('suno30Prompt').value = suno30;
+      document.getElementById('suno60Prompt').value = suno60;
+      document.getElementById('marketingPrompt').value = marketing;
+      document.getElementById('hashtagsPrompt').value = hashtags;
+      document.getElementById('seoPrompt').value = seo;
+      document.getElementById('ctaPrompt').value = cta;
+      document.getElementById('emailPrompt').value = email;
+      setStatus('Prompt generated.', 'success');
+    }
+
+    function randomizeGenerator() {
+      const objectWorldSymbols = ['coffee cup','wine glass','candle','travel suitcase','black handbag','perfume bottle','champagne glass'];
+      const lifestyleSubjects = ['Paris cafe muse','Black cafe reader','beret cafe reader','rainy avenue fashion muse','shopping muse','balcony glamour muse','rooftop date couple','luxury street-style woman','romantic couple','glam Paris woman','glam Black woman'];
+      const objectWorldSubjects = ['miniature Paris object world','rose-petal travel world','miniature perfume world','fantasy staircase dream','chrome travel typography'];
+      const roll = Math.random();
+      const mode = roll < 0.34 ? 'objectWorld' : (roll < 0.68 ? 'lifestyle' : 'fusion');
+
+      fields.forEach(field => {
+        const el = document.getElementById(field.id);
+        if (!el) return;
+        if (field.type === 'text') {
+          el.value = '';
+          return;
+        }
+
+        if (isLocked(field.id)) {
+          return;
+        }
+
+        const customEl = document.getElementById(`${field.id}Custom`);
+        if (customEl) customEl.value = '';
+
+        let pool = field.options.slice(1);
+
+        if (field.id === 'landmarkSymbol' && mode === 'objectWorld') {
+          pool = pool.filter(v => objectWorldSymbols.includes(v) || ['Eiffel Tower','pink rose petals','white florals','gold sparkles'].includes(v));
+        }
+
+        if (field.id === 'mainSubject' && mode === 'objectWorld') {
+          pool = pool.filter(v => objectWorldSubjects.includes(v));
+        }
+
+        if (field.id === 'mainSubject' && mode === 'lifestyle') {
+          pool = pool.filter(v => lifestyleSubjects.includes(v));
+        }
+
+        if (field.id === 'fusionStyle' && mode === 'objectWorld') {
+          pool = ['object-world fusion','travel-dream blend','painterly layered composite'];
+        }
+
+        if (field.id === 'fusionStyle' && mode === 'lifestyle') {
+          pool = ['travel-dream blend','painterly layered composite','double exposure'];
+        }
+
+        if (field.id === 'composition' && mode === 'objectWorld') {
+          pool = ['centered editorial poster layout','tall cinematic frame','vertical wall-art composition'];
+        }
+
+        if (field.id === 'poseView' && mode === 'objectWorld') {
+          pool = ['quiet reflective pose','poster-art glamour pose','head tilted dream pose'];
+        }
+
+        if (field.id === 'poseView' && mode === 'lifestyle') {
+          pool = ['elegant cafe seated pose','walking away cinematic pose','reading at cafe pose','holding espresso pose','shopping stride pose','balcony leaning pose','rooftop date pose','three-quarter fashion pose'];
+        }
+
+        if (field.id === 'backgroundEnergy' && mode === 'lifestyle') {
+          pool = ['cozy cafe glow','wet street reflections','balcony twilight shimmer','rooftop star haze','bokeh city lights','warm cafe steam'];
+        }
+
+        if (field.id === 'backgroundEnergy' && mode === 'objectWorld') {
+          pool = ['golden glitter burst','drifting smoke ribbon','rose petal drift','glowing sky haze','mist and glow','soft fantasy clouds'];
+        }
+
+        if (field.id === 'detailEnhancers' && mode === 'objectWorld') {
+          pool = ['miniature object-world realism','object-world depth realism','premium prompt-engineered realism','golden object-world realism','crystal-clear object-world realism'];
+        }
+
+        if (field.id === 'detailEnhancers' && mode === 'lifestyle') {
+          pool = ['elegant lifestyle storytelling','luxury shopping polish','editorial Black glam realism','high-fashion pose polish','rainy cinematic polish','romantic illustration consistency'];
+        }
+
+        el.value = pick(pool.length ? pool : field.options.slice(1));
+      });
+
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      generatePrompt();
+      setStatus(`Randomized selections applied. Mode: ${mode}.`, 'success');
+    }
+
+    function clearAll() {
+      fields.forEach(field => {
+        const el = document.getElementById(field.id);
+        if (!el) return;
+        if (field.type === 'text') {
+          el.value = '';
+        } else {
+          el.value = 'none';
+          const customEl = document.getElementById(`${field.id}Custom`);
+          if (customEl) customEl.value = '';
+          const lockEl = document.getElementById(`${field.id}Lock`);
+          if (lockEl) {
+            lockEl.classList.remove('active');
+            lockEl.textContent = 'Lock';
+          }
+        }
+      });
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.chip').forEach(chip => chip.classList.add('active'));
+      ['mainPrompt','shortPrompt','negativePrompt','variationPrompt','titlePrompt','videoPrompt','sunoJinglePrompt','suno30Prompt','suno60Prompt','marketingPrompt','hashtagsPrompt','seoPrompt','ctaPrompt','emailPrompt'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      setStatus('Selections cleared.', 'warning');
+    }
+
+    function fallbackCopyFromElement(el) {
+      const previousReadonly = el.hasAttribute('readonly');
+      const previousSelectionStart = typeof el.selectionStart === 'number' ? el.selectionStart : null;
+      const previousSelectionEnd = typeof el.selectionEnd === 'number' ? el.selectionEnd : null;
+
+      el.removeAttribute('readonly');
+      el.focus();
+      el.select();
+      el.setSelectionRange(0, el.value.length);
+
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+
+      if (previousReadonly) {
+        el.setAttribute('readonly', '');
+      }
+
+      if (previousSelectionStart !== null && previousSelectionEnd !== null) {
+        el.setSelectionRange(previousSelectionStart, previousSelectionEnd);
+      } else {
+        el.blur();
+      }
+
+      return copied;
+    }
+
+    async function copyTextFromString(text, button) {
+      if (!text) {
+        setStatus('Nothing to copy yet.', 'warning');
+        return false;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          setStatus('Copied to clipboard.', 'success');
+          return true;
+        }
+      } catch (error) {
+      }
+
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.focus();
+      temp.select();
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+      document.body.removeChild(temp);
+
+      if (copied) {
+        setStatus('Copied using fallback copy.', 'success');
+        return true;
+      }
+
+      setStatus('Clipboard is blocked here.', 'warning');
+      return false;
+    }
+
+    async function copyText(targetId, button) {
+      const el = document.getElementById(targetId);
+      if (!el || !el.value) {
+        setStatus('Nothing to copy yet.', 'warning');
+        return false;
+      }
+
+      const original = button.textContent;
+      const resetButton = () => {
+        button.textContent = original;
+        button.classList.remove('copy-success', 'copy-warning');
+      };
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(el.value);
+          button.textContent = 'Copied';
+          button.classList.add('copy-success');
+          setStatus('Copied to clipboard.', 'success');
+          setTimeout(resetButton, 1100);
+          return true;
+        }
+      } catch (error) {
+        // Fall through to legacy copy below.
+      }
+
+      const copied = fallbackCopyFromElement(el);
+      if (copied) {
+        button.textContent = 'Copied';
+        button.classList.add('copy-success');
+        setStatus('Copied using fallback copy.', 'success');
+        setTimeout(resetButton, 1100);
+        return true;
+      }
+
+      button.textContent = 'Manual Copy';
+      button.classList.add('copy-warning');
+      el.focus();
+      el.select();
+      el.setSelectionRange(0, el.value.length);
+      setStatus('Clipboard is blocked here. The text is selected so you can press Ctrl+C or Cmd+C.', 'warning');
+      setTimeout(resetButton, 1800);
+      return false;
+    }
+
+    function savePrompt() {
+      const main = document.getElementById('mainPrompt').value.trim();
+      const title = document.getElementById('titlePrompt').value.trim();
+      if (!main) {
+        setStatus('Generate a prompt before saving.', 'warning');
+        return;
+      }
+      state.extras.unshift({ title: title || 'Untitled Concept', prompt: main });
+      state.extras = state.extras.slice(0, 20);
+      renderHistory();
+      setStatus('Prompt saved to history.', 'success');
+    }
+
+    async function copyHistory() {
+      if (!state.extras.length) {
+        setStatus('No history to copy yet.', 'warning');
+        return;
+      }
+      const compiled = state.extras.map((item, index) => `${index + 1}. ${item.title}\n${item.prompt}`).join('\n\n');
+      const fakeBtn = { textContent: 'Copy History', classList: { add(){}, remove(){} } };
+      await copyTextFromString(compiled, fakeBtn);
+    }
+
+    function clearHistory() {
+      state.extras = [];
+      renderHistory();
+      setStatus('Prompt history cleared.', 'warning');
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+      if (!state.extras.length) {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.textContent = 'No saved prompts yet.';
+        list.appendChild(item);
+        return;
+      }
+      state.extras.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        if (typeof entry === 'string') {
+          item.textContent = entry;
+        } else {
+          item.textContent = `${entry.title}\n${entry.prompt}`;
+        }
+        list.appendChild(item);
+      });
+    }
+
+    function runTests() {
+      const results = [];
+      const assert = (condition, message) => {
+        results.push(`${condition ? 'PASS' : 'FAIL'}: ${message}`);
+      };
+
+      assert(typeof createField === 'function', 'createField exists');
+      assert(typeof generatePrompt === 'function', 'generatePrompt exists');
+      assert(typeof copyText === 'function', 'copyText exists');
+
+      const promptBefore = document.getElementById('mainPrompt').value;
+      assert(promptBefore.length > 0, 'initial preset generated a prompt on boot');
+
+      const sample = joinPrompt(['alpha', '', null, 'beta']);
+      assert(sample === 'alpha, beta', 'joinPrompt filters empty values correctly');
+
+      const title = buildTitle({ emotionMood: 'romantic', sceneLocation: 'Paris boulevard', landmarkSymbol: 'Eiffel Tower' });
+      assert(document.getElementById('ethnicity') !== null, 'ethnicity field renders');
+      assert(document.getElementById('bodyType') !== null, 'body type field renders');
+      assert(document.getElementById('styleFamily') !== null, 'styleFamily field renders');
+      assert(document.getElementById('landmarkSymbol').innerHTML.includes('dog companion'), 'new landmark option renders');
+      assert(document.getElementById('ethnicityLock') !== null, 'per-category lock renders');
+      assert(document.getElementById('ethnicityCustom') !== null, 'per-category custom text input renders');
+      assert(document.getElementById('styleLocksPanel') !== null, 'style locks panel renders under presets');
+      assert(document.getElementById('styleFamily').innerHTML.includes('Black love story editorial art'), 'new style family option renders');
+      assert(document.getElementById('mainSubject').innerHTML.includes('editorial Black beauty'), 'Black glam subject option renders');
+      assert(document.getElementById('fashionWardrobe').innerHTML.includes('dramatic red hat couture'), 'Black glam fashion option renders');
+      assert(document.getElementById('styleFamily').innerHTML.includes('golden wine-glass city realism'), 'wine glass style family option renders');
+      assert(document.getElementById('landmarkSymbol').innerHTML.includes('paris heart badge'), 'new paris heart landmark option renders');
+      assert(document.getElementById('styleFamily').innerHTML.includes('rose-petal suitcase Paris world'), 'suitcase style family option renders');
+      assert(document.getElementById('landmarkSymbol').innerHTML.includes('red beret'), 'red beret landmark option renders');
+      assert(document.getElementById('landmarkSymbol').innerHTML.includes('perfume bottle'), 'perfume bottle landmark option renders');
+      assert(document.getElementById('styleFamily').innerHTML.includes('editorial Paris shopping scene'), 'shopping style family option renders');
+      assert(title === 'Romantic Paris Boulevard Eiffel Tower', 'buildTitle uses available seeds correctly');
+
+      clearAll();
+      assert(document.getElementById('mainPrompt').value === '', 'clearAll empties main prompt');
+
+      applyPreset(presets[0].values);
+      document.getElementById('ethnicity').value = 'African American / Black';
+      document.getElementById('bodyType').value = 'curvy';
+      generatePrompt();
+      assert(document.getElementById('mainPrompt').value.includes('preserve African American / Black'), 'ethnicity is included in generated prompt');
+      assert(document.getElementById('mainPrompt').value.includes('body type curvy'), 'body type is included in generated prompt');
+      assert(document.getElementById('mainPrompt').value.includes('Eiffel Tower view'), 'preset application influences generated prompt');
+      document.getElementById('fusionStyle').value = 'landscape inside body';
+      generatePrompt();
+      assert(document.getElementById('mainPrompt').value.includes('no detached legs'), 'silhouette safety language is added for body fusion prompts');
+      document.getElementById('styleFamily').value = 'luxury perfume-object world';
+      document.getElementById('landmarkSymbol').value = 'perfume bottle';
+      generatePrompt();
+      assert(document.getElementById('mainPrompt').value.includes('miniature scene integrated naturally inside the object'), 'object-world safety language appears for perfume bottle prompts');
+      randomizeGenerator();
+      assert(document.getElementById('mainPrompt').value.length > 0, 'randomizer still generates a prompt');
+      assert(document.getElementById('videoPrompt').value.length > 0, 'video prompt generates');
+      assert(document.getElementById('sunoJinglePrompt').value.length > 0, 'suno jingle prompt generates');
+      assert(document.getElementById('suno30Prompt').value.length > 0, 'suno 30-second prompt generates');
+      assert(document.getElementById('suno60Prompt').value.length > 0, 'suno 1-minute prompt generates');
+      assert(document.getElementById('marketingPrompt').value.length > 0, 'marketing prompt generates');
+      assert(document.getElementById('hashtagsPrompt').value.length > 0, 'hashtags generate');
+      assert(document.getElementById('seoPrompt').value.length > 0, 'SEO keywords generate');
+      assert(document.getElementById('ctaPrompt').value.length > 0, 'CTA generates');
+      assert(document.getElementById('emailPrompt').value.length > 0, 'email promo generates');
+
+      renderHistory();
+      assert(document.getElementById('historyList').textContent.includes('No saved prompts yet.'), 'empty history placeholder renders');
+
+      const out = document.getElementById('testResults');
+      out.textContent = results.join('\n');
+      window.__testResults = results;
+    }
+
+    function boot() {
+      renderControls();
+      renderPresets();
+      renderHistory();
+      applyPreset(presets[0].values);
+      generatePrompt();
+
+      document.getElementById('generateBtn').addEventListener('click', generatePrompt);
+      document.getElementById('randomBtn').addEventListener('click', randomizeGenerator);
+      document.getElementById('clearBtn').addEventListener('click', clearAll);
+      document.getElementById('saveBtn').addEventListener('click', savePrompt);
+      document.getElementById('generateAllBtn').addEventListener('click', generatePrompt);
+      document.getElementById('copyHistoryBtn').addEventListener('click', copyHistory);
+      document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => { void copyText(btn.dataset.target, btn); });
+      });
+
+      document.getElementById('scrollTopBtn').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      document.getElementById('scrollBottomBtn').addEventListener('click', () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+
+      runTests();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
